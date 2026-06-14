@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "software": "Python",
+    "operating_system": "Ubuntu",
+    "requirement": "Install Python 3 and required packages",
+    "expected_output": "python_installation_script.txt"
+  },
+  {
+    "id": 2,
+    "software": "MySQL",
+    "operating_system": "Ubuntu",
+    "requirement": "Install MySQL server and configure database",
+    "expected_output": "mysql_installation_script.txt"
+  },
+  {
+    "id": 3,
+    "software": "Node.js",
+    "operating_system": "Windows",
+    "requirement": "Install Node.js and npm environment",
+    "expected_output": "nodejs_installation_script.txt"
+  }
+]

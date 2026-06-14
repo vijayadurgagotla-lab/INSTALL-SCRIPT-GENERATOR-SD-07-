@@ -1,0 +1,52 @@
+{
+  "nodejs": {
+    "ubuntu": {
+      "20.04": { "apt": "sudo apt update && sudo apt install nodejs npm -y", "snap": "sudo snap install node --classic" },
+      "22.04": { "apt": "sudo apt update && sudo apt install nodejs npm -y" }
+    },
+    "windows": {
+      "10": { "winget": "winget install OpenJS.NodeJS" },
+      "11": { "winget": "winget install OpenJS.NodeJS", "choco": "choco install nodejs" }
+    },
+    "mac": {
+      "any": { "brew": "brew install node" }
+    }
+  },
+  "docker": {
+    "ubuntu": {
+      "20.04": { "apt": "sudo apt update && sudo apt install docker.io -y && sudo systemctl start docker" },
+      "22.04": { "apt": "sudo apt update && sudo apt install docker.io -y && sudo systemctl start docker" }
+    },
+    "windows": {
+      "10": { "manual": "Download Docker Desktop from https://docker.com" },
+      "11": { "winget": "winget install Docker.DockerDesktop" }
+    },
+    "mac": {
+      "any": { "brew": "brew install --cask docker" }
+    }
+  },
+  "python": {
+    "ubuntu": {
+      "20.04": { "apt": "sudo apt update && sudo apt install python3 python3-pip -y" },
+      "22.04": { "apt": "sudo apt update && sudo apt install python3 python3-pip -y" }
+    },
+    "windows": {
+      "10": { "winget": "winget install Python.Python.3" },
+      "11": { "winget": "winget install Python.Python.3" }
+    },
+    "mac": {
+      "any": { "brew": "brew install python3" }
+    }
+  },
+  "git": {
+    "ubuntu": {
+      "any": { "apt": "sudo apt update && sudo apt install git -y" }
+    },
+    "windows": {
+      "any": { "winget": "winget install Git.Git" }
+    },
+    "mac": {
+      "any": { "brew": "brew install git" }
+    }
+  }
+}

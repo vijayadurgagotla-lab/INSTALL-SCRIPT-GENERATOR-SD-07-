@@ -1,0 +1,9 @@
+# Install Node.js
+
+winget install OpenJS.NodeJS
+
+# Verify installation
+
+node --version
+
+npm --version

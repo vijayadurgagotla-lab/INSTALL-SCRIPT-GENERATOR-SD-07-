@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Script Generator</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js"></script>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">🛠️</div>
+      <div class="header-title">
+        <h1>Script Generator</h1>
+        <p>AI-powered install scripts tailored to your environment</p>
+      </div>
+    </div>
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+  </div>
+
+  <!-- Body -->
+  <div class="body">
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <!-- Left Panel -->
+    <div class="left" id="sidebar">
+      <button class="sidebar-close" onclick="toggleSidebar()">✕</button>
+
+      <div class="section-label">⚙️ Configure</div>
+
+      <div class="form-group">
+        <label>Operating System</label>
+        <select id="osSelect" onchange="updateSummary()">
+          <option value="">Select OS...</option>
+          <optgroup label="Windows">
+            <option>Windows 10</option>
+            <option>Windows 11</option>
+            <option>Windows Server 2022</option>
+          </optgroup>
+          <optgroup label="Ubuntu">
+            <option>Ubuntu 20.04</option>
+            <option>Ubuntu 22.04</option>
+            <option>Ubuntu 24.04</option>
+          </optgroup>
+          <optgroup label="RHEL / CentOS">
+            <option>CentOS 7</option>
+            <option>CentOS 8</option>
+            <option>RHEL 9</option>
+            <option>Fedora 39</option>
+          </optgroup>
+          <optgroup label="Debian">
+            <option>Debian 11</option>
+            <option>Debian 12</option>
+          </optgroup>
+          <optgroup label="macOS">
+            <option>macOS Ventura</option>
+            <option>macOS Sonoma</option>
+            <option>macOS Sequoia</option>
+          </optgroup>
+          <optgroup label="Arch">
+            <option>Arch Linux</option>
+            <option>Manjaro</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Application</label>
+        <select id="appSelect" onchange="updateSummary()">
+          <option value="">Select App...</option>
+          <optgroup label="Runtimes">
+            <option>Node.js</option>
+            <option>Python 3</option>
+            <option>Java JDK</option>
+            <option>Go</option>
+            <option>Ruby</option>
+            <option>Rust</option>
+            <option>PHP</option>
+          </optgroup>
+          <optgroup label="Databases">
+            <option>PostgreSQL</option>
+            <option>MySQL</option>
+            <option>MongoDB</option>
+            <option>Redis</option>
+            <option>SQLite</option>
+            <option>MariaDB</option>
+          </optgroup>
+          <optgroup label="DevOps">
+            <option>Docker</option>
+            <option>Docker Compose</option>
+            <option>Kubernetes (kubectl)</option>
+            <option>Terraform</option>
+            <option>Ansible</option>
+          </optgroup>
+          <optgroup label="Web Servers">
+            <option>Nginx</option>
+            <option>Apache</option>
+            <option>Caddy</option>
+          </optgroup>
+          <optgroup label="Tools">
+            <option>Git</option>
+            <option>VS Code</option>
+            <option>curl</option>
+            <option>wget</option>
+            <option>htop</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Version</label>
+        <select id="versionSelect" onchange="updateSummary()">
+          <option value="">Select Version...</option>
+          <option>Latest</option>
+          <option>LTS</option>
+          <option>Stable</option>
+          <option>v18</option>
+          <option>v20</option>
+          <option>v21</option>
+          <option>3.10</option>
+          <option>3.11</option>
+          <option>3.12</option>
+          <option>17</option>
+          <option>21</option>
+        </select>
+      </div>
+
+      <!-- Installation Summary Card -->
+      <div class="summary-card" id="summaryCard" style="display:none;">
+        <div class="summary-title">📋 Installation Summary</div>
+        <div class="summary-row"><span class="summary-key">OS</span><span class="summary-val" id="sumOS">—</span></div>
+        <div class="summary-row"><span class="summary-key">App</span><span class="summary-val" id="sumApp">—</span></div>
+        <div class="summary-row"><span class="summary-key">Version</span><span class="summary-val" id="sumVer">—</span></div>
+        <div class="summary-row"><span class="summary-key">Manager</span><span class="summary-val" id="sumPkg">—</span></div>
+      </div>
+
+      <button id="generateBtn" onclick="generateScript()">⚡ Generate Script</button>
+
+      <!-- Quick Prompts -->
+      <div class="section-label" style="margin-top:4px;">💬 Quick Prompts</div>
+      <div class="quick-prompts">
+        <button class="prompt-chip" onclick="quickPrompt('Install Python 3.12 on Windows 11')">🐍 Python 3.12 on Windows</button>
+        <button class="prompt-chip" onclick="quickPrompt('Install Node.js LTS on Ubuntu 22.04')">🟢 Node.js LTS on Ubuntu</button>
+        <button class="prompt-chip" onclick="quickPrompt('Install PostgreSQL on Ubuntu 22.04')">🐘 PostgreSQL on Ubuntu</button>
+        <button class="prompt-chip" onclick="quickPrompt('Install Docker on Ubuntu 22.04')">🐳 Docker on Ubuntu</button>
+        <button class="prompt-chip" onclick="quickPrompt('Install MongoDB on macOS Sonoma')">🍃 MongoDB on macOS</button>
+        <button class="prompt-chip" onclick="quickPrompt('Install Nginx on Debian 12')">🌐 Nginx on Debian</button>
+        <button class="prompt-chip" onclick="quickPrompt('Install Redis on Ubuntu 22.04')">⚡ Redis on Ubuntu</button>
+      </div>
+
+      <!-- Recent History -->
+      <div class="section-label" style="margin-top:10px;">🕒 Recent</div>
+      <div id="historyList" class="history-list">
+        <div class="history-empty">No recent generations</div>
+      </div>
+      <button class="clear-history-btn" id="clearHistoryBtn" onclick="clearHistory()" style="display:none;">🗑️ Clear History</button>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="right">
+      <div class="chat-topbar">
+        <div class="topbar-left">
+          <div class="online-dot"></div>
+          <div>
+            <div class="topbar-name">AI Assistant</div>
+            <div class="topbar-sub">Ask anything about software installation</div>
+          </div>
+        </div>
+        <div class="topbar-actions">
+          <button class="topbar-btn" onclick="clearChat()">🗑️ Clear</button>
+        </div>
+      </div>
+
+      <div id="chatbox"></div>
+
+      <!-- Error Banner -->
+      <div id="errorBanner" class="error-banner" style="display:none;">
+        <span id="errorMsg"></span>
+        <button onclick="dismissError()">✕</button>
+      </div>
+
+      <!-- Toast -->
+      <div id="toast" class="toast"></div>
+
+      <div class="input-area">
+        <input type="text" id="userInput"
+          placeholder="e.g. How do I install Nginx on Ubuntu 22.04?" />
+        <button id="sendBtn">Send ➤</button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Loading Overlay -->
+<div id="loadingOverlay" class="loading-overlay" style="display:none;">
+  <div class="loading-box">
+    <div class="spinner"></div>
+    <div class="loading-text" id="loadingText">Generating script...</div>
+    <div class="loading-sub" id="loadingSub">Analyzing your environment</div>
+  </div>
+</div>
+
+<script>
+  const SESSION_ID = "{{ session_id }}";
+  const STORAGE_KEY = "scriptgen_history";
+  let lastScript = "";
+  let lastOS = "linux";
+  let generationHistory = [];
+  let isGenerating = false;
+
+  const pkgManagers = {
+    "Windows 10": "Chocolatey",
+    "Windows 11": "Chocolatey / Winget",
+    "Windows Server 2022": "Chocolatey / Winget",
+    "Ubuntu 20.04": "APT",
+    "Ubuntu 22.04": "APT",
+    "Ubuntu 24.04": "APT",
+    "CentOS 7": "YUM",
+    "CentOS 8": "DNF",
+    "RHEL 9": "DNF",
+    "Fedora 39": "DNF",
+    "Debian 11": "APT",
+    "Debian 12": "APT",
+    "macOS Ventura": "Homebrew",
+    "macOS Sonoma": "Homebrew",
+    "macOS Sequoia": "Homebrew",
+    "Arch Linux": "Pacman",
+    "Manjaro": "Pacman"
+  };
+
+  /* ── localStorage persistence ── */
+  function saveHistory() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(generationHistory));
+    } catch(e) { console.warn("Storage save failed:", e); }
+  }
+
+  function loadHistory() {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        generationHistory = JSON.parse(stored);
+        renderHistory();
+      }
+    } catch(e) {
+      console.warn("Storage load failed:", e);
+      generationHistory = [];
+    }
+  }
+
+  function clearHistory() {
+    if (!confirm("Clear all generation history?")) return;
+    generationHistory = [];
+    try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+    renderHistory();
+    showToast("🗑️ History cleared");
+  }
+
+  /* ── Error handling ── */
+  function showError(msg) {
+    const banner = document.getElementById("errorBanner");
+    document.getElementById("errorMsg").textContent = msg;
+    banner.style.display = "flex";
+  }
+
+  function dismissError() {
+    document.getElementById("errorBanner").style.display = "none";
+  }
+
+  /* ── Mobile sidebar ── */
+  function toggleSidebar() {
+    const sidebar = document.getElementById("sidebar");
+    const overlay = document.getElementById("sidebarOverlay");
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("show");
+    document.body.classList.toggle("sidebar-open");
+  }
+
+  /* ── Utils ── */
+  function escapeHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  function showToast(msg, type="success") {
+    const toast = document.getElementById("toast");
+    toast.textContent = msg;
+    toast.className = `toast toast-${type} show`;
+    setTimeout(() => toast.className = "toast", 2800);
+  }
+
+  function updateSummary() {
+    const os = document.getElementById("osSelect").value;
+    const app = document.getElementById("appSelect").value;
+    const ver = document.getElementById("versionSelect").value;
+    const card = document.getElementById("summaryCard");
+    if (os || app || ver) {
+      card.style.display = "block";
+      document.getElementById("sumOS").textContent = os || "—";
+      document.getElementById("sumApp").textContent = app || "—";
+      document.getElementById("sumVer").textContent = ver || "—";
+      document.getElementById("sumPkg").textContent = os ? (pkgManagers[os] || "Native") : "—";
+    } else {
+      card.style.display = "none";
+    }
+  }
+
+  function addToHistory(os, app, ver) {
+    const entry = { os, app, ver, time: new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) };
+    generationHistory.unshift(entry);
+    if (generationHistory.length > 10) generationHistory.pop();
+    saveHistory();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const list = document.getElementById("historyList");
+    const clearBtn = document.getElementById("clearHistoryBtn");
+    if (generationHistory.length === 0) {
+      list.innerHTML = '<div class="history-empty">No recent generations</div>';
+      clearBtn.style.display = "none";
+      return;
+    }
+    clearBtn.style.display = "block";
+    list.innerHTML = generationHistory.map((e, i) => `
+      <div class="history-item" onclick="rerunHistory(${i})">
+        <div class="history-label">${e.app} on ${e.os}</div>
+        <div class="history-meta">${e.ver} · ${e.time}</div>
+      </div>
+    `).join("");
+  }
+
+  function rerunHistory(i) {
+    const e = generationHistory[i];
+    if (window.innerWidth < 768) toggleSidebar();
+    appendMessage("user", `⚙️ OS: ${e.os}  |  App: ${e.app}  |  Version: ${e.ver}`);
+    sendToBot(`Generate a complete step-by-step install script for ${e.app} ${e.ver} on ${e.os}. Include: update package manager, add dependencies, add repo, install ${e.app}, start service, verify with version command.`, true);
+  }
+
+  /* ── Message rendering ── */
+  function appendMessage(role, text) {
+    const chatbox = document.getElementById("chatbox");
+    if (role === "bot") {
+      const wrapper = document.createElement("div");
+      wrapper.className = "bot-wrapper";
+      const avatar = document.createElement("div");
+      avatar.className = "avatar"; avatar.innerHTML = "🤖";
+      const div = document.createElement("div");
+      div.className = "message bot";
+
+      let html = text.replace(/```(\w+)?\n([\s\S]*?)```/g, (m, lang, code) => {
+        lastScript = code.trim();
+        lastOS = text.toLowerCase().includes("windows") ? "windows" : "linux";
+        const ext = lastOS === "windows" ? "bat" : "sh";
+        const hlLang = lastOS === "windows" ? "powershell" : "bash";
+        let highlighted;
+        try {
+          highlighted = hljs.highlight(code.trim(), { language: hlLang }).value;
+        } catch(e) {
+          highlighted = escapeHtml(code.trim());
+        }
+        return `
+          <div class="code-header">
+            <span class="code-lang">${hlLang.toUpperCase()}</span>
+            <button class="code-top-btn" onclick="copyScript()">📋 Copy</button>
+          </div>
+          <pre class="hljs-pre"><code class="hljs">${highlighted}</code></pre>
+          <div class="script-actions">
+            <button class="action-btn copy-btn" onclick="copyScript()">📋 Copy Script</button>
+            <button class="action-btn download-btn" onclick="downloadScript()">💾 Download .${ext}</button>
+            <button class="action-btn docker-btn" onclick="testInDocker()">▶ Test Script</button>
+            <button class="action-btn validate-btn" onclick="validateScript()">✅ Validate</button>
+            <button class="action-btn regen-btn" onclick="regenScript()">🔄 Regenerate</button>
+          </div>`;
+      });
+
+      html = html.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+      div.innerHTML = html;
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(div);
+      chatbox.appendChild(wrapper);
+    } else {
+      const div = document.createElement("div");
+      div.className = "message user";
+      div.textContent = text;
+      chatbox.appendChild(div);
+    }
+    chatbox.scrollTop = chatbox.scrollHeight;
+  }
+
+  function showTyping() {
+    const c = document.getElementById("chatbox");
+    const w = document.createElement("div"); w.className="bot-wrapper"; w.id="typing";
+    const a = document.createElement("div"); a.className="avatar"; a.innerHTML="🤖";
+    const t = document.createElement("div"); t.className="typing";
+    t.innerHTML="<span></span><span></span><span></span>";
+    w.appendChild(a); w.appendChild(t); c.appendChild(w);
+    c.scrollTop = c.scrollHeight;
+  }
+
+  function removeTyping() {
+    const t = document.getElementById("typing"); if(t) t.remove();
+  }
+
+  const loadingMessages = [
+    ["Generating script...", "Analyzing your environment"],
+    ["Thinking...", "Picking the best package manager"],
+    ["Almost there...", "Building step-by-step instructions"],
+    ["Crafting script...", "Adding dependency checks"],
+  ];
+
+  function showLoading() {
+    const [text, sub] = loadingMessages[Math.floor(Math.random() * loadingMessages.length)];
+    document.getElementById("loadingText").textContent = text;
+    document.getElementById("loadingSub").textContent = sub;
+    document.getElementById("loadingOverlay").style.display = "flex";
+    isGenerating = true;
+    document.getElementById("generateBtn").disabled = true;
+    document.getElementById("sendBtn").disabled = true;
+  }
+
+  function hideLoading() {
+    document.getElementById("loadingOverlay").style.display = "none";
+    isGenerating = false;
+    document.getElementById("generateBtn").disabled = false;
+    document.getElementById("sendBtn").disabled = false;
+  }
+
+  /* ── API calls ── */
+  async function sendToBot(msg, useOverlay=false) {
+    if (isGenerating) { showToast("⚠️ Please wait for the current request", "warning"); return; }
+    dismissError();
+    if (useOverlay) showLoading();
+    else showTyping();
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 30000);
+
+    try {
+      const res = await fetch("/chat", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({message:msg, session_id:SESSION_ID}),
+        signal: controller.signal
+      });
+
+      clearTimeout(timeout);
+
+      if (!res.ok) {
+        const errText = await res.text().catch(() => "Unknown error");
+        throw new Error(`Server returned ${res.status}: ${errText}`);
+      }
+
+      const data = await res.json();
+
+      if (!data.reply) throw new Error("Empty response from server");
+
+      if (useOverlay) hideLoading(); else removeTyping();
+      appendMessage("bot", data.reply);
+      if (data.reply.includes("```")) showToast("✅ Script generated successfully!");
+
+    } catch(e) {
+      clearTimeout(timeout);
+      if (useOverlay) hideLoading(); else removeTyping();
+
+      let userMsg = "❌ Something went wrong. Please try again.";
+      if (e.name === "AbortError") userMsg = "⏱️ Request timed out. The server took too long to respond.";
+      else if (!navigator.onLine) userMsg = "📡 No internet connection. Please check your network.";
+      else if (e.message.includes("500")) userMsg = "🔥 Server error (500). The backend may be down.";
+      else if (e.message.includes("429")) userMsg = "🚦 Too many requests. Please wait a moment and try again.";
+      else if (e.message.includes("Empty response")) userMsg = "⚠️ The AI returned an empty response. Try rephrasing your request.";
+
+      appendMessage("bot", userMsg);
+      showError(userMsg);
+      showToast("❌ Request failed", "error");
+      console.error("sendToBot error:", e);
+    }
+  }
+
+  function generateScript() {
+    const os = document.getElementById("osSelect").value;
+    const app = document.getElementById("appSelect").value;
+    const ver = document.getElementById("versionSelect").value;
+    if (!os || !app || !ver) {
+      showToast("⚠️ Please select OS, App and Version!", "warning");
+      showError("Please select an Operating System, Application, and Version before generating.");
+      return;
+    }
+    if (window.innerWidth < 768) toggleSidebar();
+    addToHistory(os, app, ver);
+    appendMessage("user", `⚙️ OS: ${os}  |  App: ${app}  |  Version: ${ver}`);
+    sendToBot(`Generate a complete step-by-step install script for ${app} ${ver} on ${os}. Include: update package manager, add dependencies, add repo, install ${app}, start service, verify with version command.`, true);
+  }
+
+  function quickPrompt(msg) {
+    if (window.innerWidth < 768) toggleSidebar();
+    appendMessage("user", msg);
+    sendToBot(msg, true);
+  }
+
+  async function sendMessage() {
+    if (isGenerating) { showToast("⚠️ Please wait for the current request", "warning"); return; }
+    const input = document.getElementById("userInput");
+    const msg = input.value.trim();
+    if (!msg) return;
+    appendMessage("user", msg);
+    input.value = "";
+    await sendToBot(msg);
+  }
+
+  function copyScript() {
+    if (!lastScript) { showToast("⚠️ No script to copy", "warning"); return; }
+    navigator.clipboard.writeText(lastScript)
+      .then(() => showToast("📋 Script copied to clipboard!"))
+      .catch(() => showToast("❌ Copy failed — try selecting manually", "error"));
+  }
+
+  function downloadScript() {
+    if (!lastScript) { showToast("⚠️ No script to download", "warning"); return; }
+    const ext = lastOS === "windows" ? "bat" : "sh";
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([lastScript], {type:"text/plain"}));
+    a.download = `install_script.${ext}`; a.click();
+    showToast(`💾 Downloaded install_script.${ext}`);
+  }
+
+  function testInDocker() {
+    if (!lastScript) { showToast("⚠️ No script to test", "warning"); return; }
+    const df = `FROM ubuntu:22.04\nRUN apt-get update -y\nRUN ${lastScript.split('\n').filter(l=>l.trim()&&!l.trim().startsWith('#')).slice(0,5).join(' && \\\n    ')}\nCMD ["/bin/bash"]`;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([df], {type:"text/plain"}));
+    a.download = "Dockerfile"; a.click();
+    appendMessage("bot","🐳 **Dockerfile downloaded!**\n\nTo test:\n```bash\ndocker build -t test-install .\ndocker run -it test-install\n```");
+    showToast("▶ Dockerfile ready to test!");
+  }
+
+  function regenScript() {
+    const os = document.getElementById("osSelect").value || "your OS";
+    const app = document.getElementById("appSelect").value || "the application";
+    const ver = document.getElementById("versionSelect").value || "latest";
+    appendMessage("user", "🔄 Regenerate with a different approach.");
+    sendToBot(`Regenerate a fresh install script for ${app} ${ver} on ${os} using an alternative method if possible.`, true);
+  }
+
+  async function validateScript() {
+    if (!lastScript) { showToast("⚠️ No script to validate", "warning"); return; }
+    appendMessage("user","✅ Validate this script for errors and security issues.");
+    showTyping();
+    try {
+      const res = await fetch("/validate", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({script:lastScript})
+      });
+      if (!res.ok) throw new Error(`Validation server error ${res.status}`);
+      const data = await res.json();
+      removeTyping();
+      appendMessage("bot", data.reply);
+    } catch(e) {
+      removeTyping();
+      const msg = e.message.includes("404")
+        ? "⚠️ Validation endpoint not found. Make sure /validate is set up in your Flask app."
+        : "❌ Validation failed. Please try again.";
+      appendMessage("bot", msg);
+      showToast("❌ Validation failed", "error");
+      console.error("validateScript error:", e);
+    }
+  }
+
+  function clearChat() {
+    if (!confirm("Clear chat history?")) return;
+    document.getElementById("chatbox").innerHTML = "";
+    lastScript = ""; lastOS = "linux";
+    dismissError();
+    appendMessage("bot","👋 Chat cleared! Select your **OS**, **App** and **Version** or type a question below.");
+  }
+
+  /* ── Network status ── */
+  window.addEventListener("online",  () => { dismissError(); showToast("📡 Back online!", "success"); });
+  window.addEventListener("offline", () => { showError("📡 You are offline. Check your internet connection."); });
+
+  /* ── Keyboard shortcut: Ctrl+Enter to generate ── */
+  document.addEventListener("keydown", e => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") generateScript();
+  });
+
+  /* ── Init ── */
+  document.getElementById("sendBtn").addEventListener("click", sendMessage);
+  document.getElementById("userInput").addEventListener("keypress", e => {
+    if (e.key === "Enter") sendMessage();
+  });
+
+  loadHistory();
+  appendMessage("bot","👋 Welcome to **Script Generator**!\n\nChoose your operating system, application, and version to generate a ready-to-run installation script.\n\n💡 Or try a **Quick Prompt** from the left panel, or just type your question below!\n\n⌨️ Tip: Press **Ctrl + Enter** to generate a script quickly.");
+</script>
+</body>
+</html>
