@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # Script Generator
 
 ## Project Overview
@@ -293,7 +293,3 @@ Purpose:
 AI Script Generator demonstrates the use of Generative AI and intelligent automation for simplifying software installation tasks.
 
 By combining an AI Agent, Knowledge Base, and Large Language Model, the system provides a scalable solution for automatic script generation and configuration assistance.
-=======
-# INSTALL-SCRIPT-GENERATOR-SD-07-
-AI-powered installation script generator that automates the creation of platform-specific software installation scripts for Windows, Linux, and macOS, with script validation, syntax highlighting, and interactive assistance.
->>>>>>> 49d925d1ce7bdceb7cbfb5529fe4b0d84546ee90
