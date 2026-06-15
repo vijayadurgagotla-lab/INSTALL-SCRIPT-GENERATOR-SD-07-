@@ -11,6 +11,10 @@ The main objective of this project is to reduce manual scripting effort, minimiz
 
 ---
 
+Live Demo
+https://www.loom.com/share/77d82a84008f4053847b6f9cfea1214a
+
+
 # Features
 
 * AI-powered installation script generation
