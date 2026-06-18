@@ -10,7 +10,7 @@ The application uses an AI Agent with a domain-specific Knowledge Base to unders
 The main objective of this project is to reduce manual scripting effort, minimize configuration errors, and simplify software deployment through AI-powered automation.
 
 ---
-
+PPT https://www.canva.com/design/DAHMzNr6UOw/jX22PSbbe6RrijRBQHXcaA/edit?ui=eyJEIjp7IlAiOnsiQiI6ZmFsc2V9fX0
 Live Demo
 https://www.loom.com/share/77d82a84008f4053847b6f9cfea1214a
 Generate your API key to run this project.
